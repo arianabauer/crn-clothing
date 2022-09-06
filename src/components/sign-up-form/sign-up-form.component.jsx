@@ -1,5 +1,8 @@
 import { useState} from 'react';
 
+import { createAuthUserWithEmailAndPassword } from '../../utils/firebase/firebase.utils'; 
+
+
 const defaultFormFields = {
     displayName: '',
     email: '',
@@ -13,6 +16,26 @@ const SignUpForm = () => {
 
     console.log(formFields);
 
+    const handleSubmit = async (event) => {
+        console.log("hit handle submit");
+        event.preventDefault();
+
+        //check if passwords mathc
+        if(password !== confirmPassword){
+            alert("Passwords do not match");
+            return;
+        }
+        
+        //check if you authenticated user, if not create user
+        try{
+            const response = await createAuthUserWithEmailAndPassword(email, password);
+            console.log(response);
+
+        } catch (error){
+            console.log('user creation error: ', error);
+        }
+    }
+
     const handleChange = (event) => {
         const { name, value} = event.target;
         //the ... notation descructures the object here. it called property spread notation
@@ -23,7 +46,7 @@ const SignUpForm = () => {
     return (
         <div>
             <h1>Sign up with your email and password.</h1>
-            <form onSubmit={ () => {} }>
+            <form onSubmit={ handleSubmit }>
                 <label>Display Name</label>
                 <input type="text" required onChange={handleChange} name="displayName" value={displayName}/>
 
@@ -36,7 +59,7 @@ const SignUpForm = () => {
                 <label>Confirm Password</label>
                 <input type="new-password" required onChange={handleChange} name="confirmPassword" value={confirmPassword}/>
 
-                <button type="submit">Sign Up</button>
+                <button type="submit" >Sign Up</button>
             </form>
         </div>
     )
