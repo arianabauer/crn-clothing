@@ -2,7 +2,8 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, signInWithRedirect,
           signInWithPopup, GoogleAuthProvider,
-        createUserWithEmailAndPassword } from 'firebase/auth';
+        createUserWithEmailAndPassword,
+      signInWithEmailAndPassword } from 'firebase/auth';
 import { getFirestore,doc,getDoc,setDoc } from 'firebase/firestore';
 
 
@@ -48,9 +49,16 @@ export const createUserDocumentFromAuth = async (userAuth, additionalInformation
     }
     catch (error)
     {
-      console.log(error);
+      switch(error.code){
+        case 'auth/':
+          alert('incorrect password for email');
+          break;
+        default:
+          console.log(error);
+          break;
+        }
+      }
     }
-  }
 
   return userDocRef;
   
@@ -61,4 +69,26 @@ export const createAuthUserWithEmailAndPassword = async (email, password) => {
   if(!email || !password) return;
 
   return await createUserWithEmailAndPassword(auth, email, password);
+};
+
+export const signInAuthUserWithEmailAndPassword = async (email, password) => {
+  if(!email || !password) return;
+
+  try{
+    return await signInWithEmailAndPassword(auth, email, password);
+    }
+  catch(error)
+  {
+    switch(error.code){
+      case 'auth/wrong-password':
+        alert('incorrect password for email');
+        break;
+      case 'auth/user-not-found':
+        alert('the user account was not found');
+        break;
+      default:
+        console.log(error);
+        break;
+      }
+  }
 };
